@@ -2,40 +2,77 @@ import os # Os to clear the console from clutter
 import time as t # Time to delay console changes
 from tabulate import tabulate as tab # Used to create a well-formatted manner console printed table
 import numpy_financial as npf # Collection of elementary financial functions used for computing payment against loan principal plus interest.
+from datetime import datetime # To get current day
+import pandas as pd # For data framing and access
+
+# Avoid scientific notation
+pd.set_option("display.float_format", "{:,.2f}".format)
 
 # Reusable function for clearing the console
 def clear(seconds):
     t.sleep(seconds) # This is to indicate how long will it take before clearing
     os.system('cls' if os.name == 'nt' else 'clear') # Clear console statement
 
+def show_funds(fund_type, funds_df, day):
+    # Copy to avoid modifying the original DataFrame
+    display_df = funds_df.copy()
+    display_df["Stock Price"] = display_df["Stock Price"].astype(float)
+    display_df["Market Cap"] = display_df["Stock Price"] * display_df["Outstanding Shares"]
+    display_df = display_df[["Company", "Stock Price", "Outstanding Shares", "Market Cap"]]
+    display_df = display_df.reset_index(drop=True)
+    display_df.index += 1  # For user-friendly display
+
+    print(f"\n{fund_type} Funds (Prices as of {day}):\n")
+    print(tab(display_df, headers="keys", tablefmt="github"))
+        
 
 # Function for investing in Philippine Stock Exchange
 def invest_in_pse():
-    
-    # Dictionaries for different fund types
-    renewable_funds = {
-        "AC Energy (ACEN)": 2.22,
-        "First Gen Corp. (FGEN)": 16.4,
-        "Solar Philippines (SPNEC)": 1.3
+    today = datetime.today()
+    day = today.strftime("%A") # Get the current day of the week
+
+    # For simulating changes in stock prices
+    days = {
+        "Monday": 1.23,
+        "Tuesday": 1.45,
+        "Wednesday": 1.67,
+        "Thursday": 0.89,
+        "Friday": 1.11,
+        "Saturday": 1.33,
+        "Sunday": 1.55
     }
     
-    gaming_funds = {
-        "Digi Plus Interactive Corp. (PLUS)": 23,
-        "Bloomberg Resorts Corp. (BLOOM)": 3.1,
-        "PhilWeb Corp. (WEB)": 3.22
-    }
+    multiplier = days[day]
     
-    utility_funds = {
-        "Manila Electric Company (MER)": 535,
-        "Aboitiz Power Corp. (AP)": 42.4,
-        "Manila Water Company Inc. (MWC)": 42
-    }
-    
-    mining_funds = {
-        "Nickel Asia Corp. (NIKL)": 2.79,
-        "Apex Mining Company Inc. (APX)": 6.76,
-        "Philex Mining Corporation (PX)": 6.65
-    }
+    # 0 for renewable funds, 1 for gaming funds, 2 for utility funds, 3 for mining funds
+    companies_data = [
+        ["AC Energy (ACEN)", 2.22 * multiplier, 39677394773, None, 0],
+        ["First Gen Corp. (FGEN)", 16.4 * multiplier, 50073050000, None, 0],
+        ["Solar Philippines (SPNEC)", 1.3 * multiplier, 3596575505, None, 0],
+        ["Digi Plus Interactive Corp. (PLUS)", 23 * multiplier, 4507493678, None, 1],
+        ["Bloomberg Resorts Corp. (BLOOM)", 3.1 * multiplier, 11487534908, None, 1],
+        ["PhilWeb Corp. (WEB)", 3.22 * multiplier, 1435776680, None, 1],
+        ["Manila Electric Company (MER)", 535 * multiplier, 1127092509, None, 1],
+        ["Aboitiz Power Corp. (AP)", 42.4 * multiplier, 7205854307, None, 2],
+        ["Manila Water Company Inc. (MWC)", 42 * multiplier, 2601499272, None, 2],
+        ["Nickel Asia Corp. (NIKL)", 2.79 * multiplier, 13931125094, None, 3],
+        ["Apex Mining Company Inc. (APX)", 6.76 * multiplier, 6227887491, None, 3],
+        ["Philex Mining Corporation (PX)", 6.65 * multiplier, 5782399068, None, 3]
+    ]
+
+    dataframe = pd.DataFrame(companies_data, columns=["Company", "Stock Price", "Outstanding Shares", "Market Cap", "Fund Type"])
+
+    renewable_funds = dataframe[dataframe["Fund Type"] == 0]
+    gaming_funds = dataframe[dataframe["Fund Type"] == 1]
+    utility_funds = dataframe[dataframe["Fund Type"] == 2]
+    mining_funds = dataframe[dataframe["Fund Type"] == 3]
+
+    # Set the 4th value(market cap) to the product of the stock price and outstanding shares if both exist
+    for index, row in dataframe.iterrows():
+        if pd.notna(row["Stock Price"]) and pd.notna(row["Outstanding Shares"]):
+            market_cap = row["Stock Price"] * row["Outstanding Shares"]
+            # Format as string with commas, no scientific notation
+            dataframe.at[index, "Market Cap"] = f"{market_cap:,.2f}"
 
     # Fund type selection
     print("\n\tSelect Fund Type")
@@ -43,23 +80,20 @@ def invest_in_pse():
     print("[2] Gaming")
     print("[3] Utilities")
     print("[4] Mining\n")
-    fund_choice = input("Enter choice: ")
 
-    if fund_choice == "1":
-        funds = renewable_funds
-        fund_type = "Renewable Energy"
-    elif fund_choice == "2":
-        funds = gaming_funds
-        fund_type = "Gaming"
-    elif fund_choice == "3":
-        funds = utility_funds
-        fund_type = "Utilities"
-    elif fund_choice == "4":
-        funds = mining_funds
-        fund_type = "Mining"
+    choice = input("Enter choice: ")
+
+    if choice == "1":
+        show_funds("Renewable Energy", renewable_funds, day)
+        clear(10)
+    elif choice == "2":
+        show_funds("Gaming", gaming_funds, day)
+    elif choice == "3":
+        show_funds("Utilities", utility_funds, day)
+    elif choice == "4":
+        show_funds("Mining", mining_funds, day)
     else:
         print("Invalid choice")
-        return
 
     clear(1)
     
@@ -224,7 +258,7 @@ print("\nWelcome to Fintech console app!")
 while logged_in:
     print("\n\tSelect a transaction")
     t.sleep(.5)
-    print("[1] Invest in PSE Fund \033[31m(NOT AVAILABLE)\033[0m")
+    print("[1] Invest in PSE Fund")
     print("[2] Obtain a loan")
     print("[3] Pay Utility Bills")
     print("[4] Logout\n")
