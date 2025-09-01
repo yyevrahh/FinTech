@@ -45,8 +45,8 @@ def invest_session(funds_arr):
         choice_company = input("Enter choice: ")
         if choice_company.isdigit() and 1 <= int(choice_company) <= len(funds_arr):
             break
-        print("Invalid choice. Please try again.\n")
-        
+        print("\033[31mInvalid choice. Please try again.\033[0m\n")
+
     company_choice = funds_arr.iloc[int(choice_company) - 1]
     print(f"\nYou have chosen to invest in {company_choice['Company']}")
     
@@ -55,7 +55,7 @@ def invest_session(funds_arr):
     
     # Simulate investment processing
     t.sleep(2)
-    print("Investment processed successfully!\n")
+    print("\033[1;32mInvestment processed successfully!\033[0m\n")
     print(f"You have purchased \033[1;37m{math.floor(amount / company_choice['Stock Price']):,} shares\033[0m of {company_choice['Company']} at ₱{company_choice['Stock Price']:.2f} per share.")
     
     input("\nPress Enter to continue...")
@@ -183,7 +183,8 @@ def obtain_loan():
         tenor = 60
         interest_rate = 0.05
     else:
-        print("Invalid choice")
+        print("\033[31mInvalid choice\033[0m")
+        clear(.5)
         return
 
     print("Generating amortization schedule...")
@@ -193,7 +194,7 @@ def obtain_loan():
     monthly_payment = npf.pmt(interest_rate / 12, tenor, -amount)
     
     # Show the monthly payment
-    print(f"\nMonthly payment for ₱{amount} over {tenor} months is: ₱{monthly_payment:.2f}")
+    print(f"\nMonthly payment for ₱{amount:,.2f} over {tenor} months is: ₱{monthly_payment:,.2f}")
 
     # Placeholders for amortization schedule
     months = []
@@ -268,15 +269,16 @@ def pay_util_bills():
         print("You selected DITO Telecom")
 
     else:
-        print("Invalid choice")
+        print("\033[31mInvalid choice\033[0m")
+        clear(.5)
         return
 
     contract_number = input("Enter contract number: ")
-    amount = input("Enter amount to pay: ₱ ")
+    amount = float(input("Enter amount to pay: ₱ "))
 
-    print(f"Processing payment for ₱{amount} on contract {contract_number}...")
+    print(f"Processing payment for ₱{amount:,.2f} on contract {contract_number}...")
     t.sleep(2)
-    print("Payment successful!")
+    print("\n\033[1;32mPayment successful!\033[0m")
     clear(1.5)
 
 # Main program side
@@ -291,7 +293,7 @@ logged_in = False
 while not logged_in:
     if username == "fintech2026" and password == "admin123":
         logged_in = True
-        print("\nLogin successful!")
+        print("\n\tLogin successful!")
         clear(1)
         
     else:
