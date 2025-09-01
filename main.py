@@ -4,6 +4,7 @@ from tabulate import tabulate as tab # Used to create a well-formatted manner co
 import numpy_financial as npf # Collection of elementary financial functions used for computing payment against loan principal plus interest.
 from datetime import datetime # To get current day
 import pandas as pd # For data framing and access
+import math 
 
 # Avoid scientific notation
 pd.set_option("display.float_format", "{:,.2f}".format)
@@ -14,18 +15,45 @@ def clear(seconds):
     os.system('cls' if os.name == 'nt' else 'clear') # Clear console statement
 
 def show_funds(fund_type, funds_df, day):
-    # Copy to avoid modifying the original DataFrame
     display_df = funds_df.copy()
     display_df["Stock Price"] = display_df["Stock Price"].astype(float)
+
+    # Calculate market cap
     display_df["Market Cap"] = display_df["Stock Price"] * display_df["Outstanding Shares"]
+
+    # Format columns to avoid scientific notation and add commas
+    display_df["Outstanding Shares"] = display_df["Outstanding Shares"].apply(lambda x: f"{x:,}")
+    display_df["Market Cap"] = display_df["Market Cap"].apply(lambda x: f"{x:,.2f}")
+
+    # Only keep clean columns
     display_df = display_df[["Company", "Stock Price", "Outstanding Shares", "Market Cap"]]
     display_df = display_df.reset_index(drop=True)
-    display_df.index += 1  # For user-friendly display
+    display_df.index += 1  
 
+    # Display the table
     print(f"\n{fund_type} Funds (Prices as of {day}):\n")
     print(tab(display_df, headers="keys", tablefmt="github"))
-        
+    print
 
+def invest_session(funds_arr):
+    print("\nEnter the number of the company you want to invest in: ")
+    choice_company = input("Enter choice: ")
+        
+    company_choice = funds_arr.iloc[int(choice_company) - 1]
+    print(f"You have chosen to invest in {company_choice['Company']}")
+    
+    amount = float(input("Enter amount to invest: ₱ "))
+    print(f"Processing your investment of ₱{amount:,} in {company_choice['Company']}...")
+    
+    # Simulate investment processing
+    t.sleep(2)
+    print("Investment processed successfully!\n")
+    print(f"You have purchased \033[1;37m{math.floor(amount / company_choice['Stock Price']):,} shares\033[0m of {company_choice['Company']} at ₱{company_choice['Stock Price']:.2f} per share.")
+    
+    input("\nPress Enter to continue...")
+    clear(2)
+    
+        
 # Function for investing in Philippine Stock Exchange
 def invest_in_pse():
     today = datetime.today()
@@ -43,7 +71,8 @@ def invest_in_pse():
     }
     
     multiplier = days[day]
-    
+
+    # Create companies data list
     # 0 for renewable funds, 1 for gaming funds, 2 for utility funds, 3 for mining funds
     companies_data = [
         ["AC Energy (ACEN)", 2.22 * multiplier, 39677394773, None, 0],
@@ -60,19 +89,17 @@ def invest_in_pse():
         ["Philex Mining Corporation (PX)", 6.65 * multiplier, 5782399068, None, 3]
     ]
 
+    # Format into DataFrame with headers
     dataframe = pd.DataFrame(companies_data, columns=["Company", "Stock Price", "Outstanding Shares", "Market Cap", "Fund Type"])
 
+    # Separate dataframes for each fund type
     renewable_funds = dataframe[dataframe["Fund Type"] == 0]
     gaming_funds = dataframe[dataframe["Fund Type"] == 1]
     utility_funds = dataframe[dataframe["Fund Type"] == 2]
     mining_funds = dataframe[dataframe["Fund Type"] == 3]
 
-    # Set the 4th value(market cap) to the product of the stock price and outstanding shares if both exist
-    for index, row in dataframe.iterrows():
-        if pd.notna(row["Stock Price"]) and pd.notna(row["Outstanding Shares"]):
-            market_cap = row["Stock Price"] * row["Outstanding Shares"]
-            # Format as string with commas, no scientific notation
-            dataframe.at[index, "Market Cap"] = f"{market_cap:,.2f}"
+    # Calculation for market cap
+    dataframe["Market Cap"] = dataframe["Stock Price"] * dataframe["Outstanding Shares"]
 
     # Fund type selection
     print("\n\tSelect Fund Type")
@@ -85,13 +112,20 @@ def invest_in_pse():
 
     if choice == "1":
         show_funds("Renewable Energy", renewable_funds, day)
-        clear(10)
+        invest_session(renewable_funds)
+        
     elif choice == "2":
         show_funds("Gaming", gaming_funds, day)
+        invest_session(gaming_funds)
+        
     elif choice == "3":
         show_funds("Utilities", utility_funds, day)
+        invest_session(utility_funds)
+
     elif choice == "4":
         show_funds("Mining", mining_funds, day)
+        invest_session(mining_funds)
+
     else:
         print("Invalid choice")
 
