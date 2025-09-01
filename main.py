@@ -35,15 +35,22 @@ def show_funds(fund_type, funds_df, day):
     print(tab(display_df, headers="keys", tablefmt="github"))
     print
 
+
 def invest_session(funds_arr):
-    print("\nEnter the number of the company you want to invest in: ")
-    choice_company = input("Enter choice: ")
+    while True:
+        print("\nEnter the number of the company you want to invest in: ")
+        choice_company = input("Enter choice: ")
+        if choice_company.isdigit() and 1 <= int(choice_company) <= len(funds_arr):
+            break
+        print("Invalid choice. Please try again.\n")
+    
+    
         
     company_choice = funds_arr.iloc[int(choice_company) - 1]
-    print(f"You have chosen to invest in {company_choice['Company']}")
+    print(f"\nYou have chosen to invest in {company_choice['Company']}")
     
     amount = float(input("Enter amount to invest: ₱ "))
-    print(f"Processing your investment of ₱{amount:,} in {company_choice['Company']}...")
+    print(f"\nProcessing your investment of ₱{amount:,} in {company_choice['Company']}...")
     
     # Simulate investment processing
     t.sleep(2)
@@ -81,7 +88,7 @@ def invest_in_pse():
         ["Digi Plus Interactive Corp. (PLUS)", 23 * multiplier, 4507493678, None, 1],
         ["Bloomberg Resorts Corp. (BLOOM)", 3.1 * multiplier, 11487534908, None, 1],
         ["PhilWeb Corp. (WEB)", 3.22 * multiplier, 1435776680, None, 1],
-        ["Manila Electric Company (MER)", 535 * multiplier, 1127092509, None, 1],
+        ["Manila Electric Company (MER)", 535 * multiplier, 1127092509, None, 2],
         ["Aboitiz Power Corp. (AP)", 42.4 * multiplier, 7205854307, None, 2],
         ["Manila Water Company Inc. (MWC)", 42 * multiplier, 2601499272, None, 2],
         ["Nickel Asia Corp. (NIKL)", 2.79 * multiplier, 13931125094, None, 3],
@@ -106,9 +113,10 @@ def invest_in_pse():
     print("[1] Renewable Energy")
     print("[2] Gaming")
     print("[3] Utilities")
-    print("[4] Mining\n")
+    print("[4] Mining")
+    print("[5] Go back")
 
-    choice = input("Enter choice: ")
+    choice = input("\nEnter choice: ")
 
     if choice == "1":
         show_funds("Renewable Energy", renewable_funds, day)
@@ -125,6 +133,9 @@ def invest_in_pse():
     elif choice == "4":
         show_funds("Mining", mining_funds, day)
         invest_session(mining_funds)
+    
+    elif choice == "5":
+        clear(1)
 
     else:
         print("Invalid choice")
@@ -267,7 +278,7 @@ def pay_util_bills():
     print("Payment successful!")
     clear(1.5)
 
-
+clear(1)
 # Credentials input
 print("\n\tLOGIN")
 username = input("Enter username: ")
@@ -278,11 +289,11 @@ logged_in = False
 while not logged_in:
     if username == "fintech2026" and password == "admin123":
         logged_in = True
-        print("Login successful!")
+        print("\nLogin successful!")
         clear(1)
         
     else:
-        print("Login failed. Please try again.")
+        print("\n\033[31mLogin failed. Please try again.\033[0m")
         clear(1.5)
         username = input("Enter username: ")
         password = input("Enter password: ")
