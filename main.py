@@ -24,6 +24,7 @@ def show_funds(fund_type, funds_df, day):
     display_df["Market Cap"] = display_df["Stock Price"] * display_df["Outstanding Shares"]
 
     # Format columns to avoid scientific notation and add commas
+    display_df["Stock Price"] = display_df["Stock Price"].apply(lambda x: f"{x:,.2f}")
     display_df["Outstanding Shares"] = display_df["Outstanding Shares"].apply(lambda x: f"{x:,}")
     display_df["Market Cap"] = display_df["Market Cap"].apply(lambda x: f"{x:,.2f}")
 
