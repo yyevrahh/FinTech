@@ -195,7 +195,7 @@ def obtain_loan():
     monthly_payment = npf.pmt(interest_rate / 12, tenor, -amount)
     
     # Show the monthly payment
-    print(f"\nMonthly payment for ₱{amount:,.2f} over {tenor} months is: ₱{monthly_payment:,.2f}")
+    print(f"\nEstimated monthly payment for ₱{amount:,.2f} over {tenor} months is: ₱{monthly_payment:,.2f}")
 
     # Placeholders for amortization schedule
     months = []
