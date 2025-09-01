@@ -14,6 +14,8 @@ def clear(seconds):
     t.sleep(seconds) # This is to indicate how long will it take before clearing
     os.system('cls' if os.name == 'nt' else 'clear') # Clear console statement
 
+
+# Function to display funds in a formatted table
 def show_funds(fund_type, funds_df, day):
     display_df = funds_df.copy()
     display_df["Stock Price"] = display_df["Stock Price"].astype(float)
@@ -36,6 +38,7 @@ def show_funds(fund_type, funds_df, day):
     print
 
 
+# Function to handle investment session for a selected fund type
 def invest_session(funds_arr):
     while True:
         print("\nEnter the number of the company you want to invest in: ")
@@ -43,8 +46,6 @@ def invest_session(funds_arr):
         if choice_company.isdigit() and 1 <= int(choice_company) <= len(funds_arr):
             break
         print("Invalid choice. Please try again.\n")
-    
-    
         
     company_choice = funds_arr.iloc[int(choice_company) - 1]
     print(f"\nYou have chosen to invest in {company_choice['Company']}")
@@ -141,9 +142,9 @@ def invest_in_pse():
         print("Invalid choice")
 
     clear(1)
-    
 
 
+# Function to obtain a loan and display amortization schedule
 def obtain_loan():
     print("\n\tObtain a loan")
     amount = float(input("Enter loan amount: ₱ "))
@@ -278,6 +279,7 @@ def pay_util_bills():
     print("Payment successful!")
     clear(1.5)
 
+# Main program side
 clear(1)
 # Credentials input
 print("\n\tLOGIN")
@@ -300,6 +302,7 @@ while not logged_in:
 
 print("\nWelcome to Fintech console app!")
 
+# Main transaction loop after login
 while logged_in:
     print("\n\tSelect a transaction")
     t.sleep(.5)
